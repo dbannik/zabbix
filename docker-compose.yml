@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  web:
+    image: zabbix/zabbix-web-nginx-pgsql:$ZBX_VERSION
+    environment:
+      DB_SERVER_HOST: db
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      ZBX_SERVER_HOST: app
+      PHP_TZ: $TZ
+
+  app:
+    image: zabbix/zabbix-server-pgsql:$ZBX_VERSION
+    environment:
+      DB_SERVER_HOST: db
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+    volumes:
+      - ./data/export:/var/lib/zabbix/export
+      - ./data/snmptraps:/var/lib/zabbix/snmptraps
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_USER: $DB_USER
+      POSTGRES_DB: $DB_NAME
+    volumes:
+      - data-db:/var/lib/postgresql/data
+
+volumes:
+  data-db:
